@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Valentine's Card 💌</title>
+<style>
+  body {
+    margin: 0;
+    font-family: 'Arial', sans-serif;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #FFB6C1; /* Valentine pink */
+    overflow: hidden;
+    flex-direction: column;
+  }
+
+  /* Envelope style */
+  #envelope {
+    width: 320px;
+    height: 180px;
+    background: #fff0f5;
+    border: 2px solid #ff69b4;
+    border-radius: 12px;
+    position: relative;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  #flap {
+    width: 0; 
+    height: 0; 
+    border-left: 160px solid transparent;
+    border-right: 160px solid transparent;
+    border-bottom: 90px solid #ff69b4;
+    position: absolute;
+    top: -90px;
+    left: 0;
+    transition: transform 1s;
+  }
+
+  #openBtn {
+    padding: 15px 30px;
+    font-size: 1.3em;
+    border: none;
+    border-radius: 12px;
+    background-color: #ff69b4;
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s, background-color 0.2s;
+  }
+
+  #openBtn:hover { transform: scale(1.05); background-color: #ff1493; }
+
+  #card {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    font-size: 1.4em;
+    color: #800000;
+  }
+
+  #reaction img { width: 150px; margin-top: 10px; }
+
+  .heart {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: red;
+    transform: rotate(-45deg);
+    animation: floatUp linear infinite;
+  }
+
+  .heart::before, .heart::after {
+    content: "";
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: red;
+    border-radius: 50%;
+  }
+
+  .heart::before { top: -10px; left: 0; }
+  .heart::after { top: 0; left: 10px; }
+
+  @keyframes floatUp {
+    0% { transform: translateY(0) rotate(-45deg); opacity: 1; }
+    100% { transform: translateY(-600px) rotate(-45deg); opacity: 0; }
+  }
+
+  @keyframes shake {
+    0% { transform: translateX(0px); }
+    25% { transform: translateX(-10px); }
+    50% { transform: translateX(10px); }
+    75% { transform: translateX(-10px); }
+    100% { transform: translateX(0px); }
+  }
+</style>
+</head>
+<body>
+
+<!-- Envelope -->
+<div id="envelope">
+  <div id="flap"></div>
+  <button id="openBtn">📩 Open your Valentine</button>
+
+  <div id="card">
+    Gabrielle (MI REINA), will you be my Valentine? 💌
+    <div>
+      <button onclick="choose('yes')">Yes 💖</button>
+      <button onclick="choose('no')">No 💔</button>
+    </div>
+    <div id="reaction"></div>
+  </div>
+</div>
+
+<audio autoplay loop>
+  <source src="https://www.bensound.com/bensound-music/bensound-romantic.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+let noCount = 0;
+let choiceRecorded = false;
+
+const envelope = document.getElementById('envelope');
+const flap = document.getElementById('flap');
+const openBtn = document.getElementById('openBtn');
+const card = document.getElementById('card');
+const reaction = document.getElementById('reaction');
+
+openBtn.addEventListener('click', () => {
+  flap.style.transform = 'rotateX(180deg)';
+  openBtn.style.display = 'none';
+  setTimeout(() => { card.style.display = 'flex'; }, 1000);
+});
+
+function choose(option){
+  reaction.innerHTML = '';
+  if(option==='yes'){
+    localStorage.setItem('valentineChoice','yes');
+    choiceRecorded = true;
+    reaction.innerHTML = `
+      🎉 Dancing bunny says YES!<br>
+      <img src="https://media.giphy.com/media/1Qd0FmHh4FQpK/giphy.gif" alt="Dancing Bunny">
+    `;
+    createHearts(50);
+  } else {
+    noCount++;
+    if(noCount<5){
+      card.style.animation='shake 0.5s';
+      setTimeout(()=>card.style.animation='',500);
+      reaction.innerHTML = `
+        😢 Crying baby says: "Pick yes my love... 14th of February"<br>
+        <img src="https://media.giphy.com/media/3o6Zt481isNVuQI1l6/giphy.gif" alt="Crying Baby">
+      `;
+      setTimeout(()=>reaction.innerHTML='',3000);
+    } else {
+      localStorage.setItem('valentineChoice','yes');
+      choiceRecorded = true;
+      reaction.innerHTML = `
+        😍 Haha! You have no choice now!<br>
+        Dancing bunny says YES!<br>
+        <img src="https://media.giphy.com/media/1Qd0FmHh4FQpK/giphy.gif" alt="Dancing Bunny">
+      `;
+      createHearts(50);
+    }
+  }
+}
+
+function createHearts(count=30){
+  for(let i=0;i<count;i++){
+    let heart=document.createElement('div');
+    heart.className='heart';
+    heart.style.left=Math.random()*window.innerWidth+'px';
+    heart.style.animationDuration=3+Math.random()*2+'s';
+    document.body.appendChild(heart);
+    setTimeout(()=>heart.remove(),5000);
+  }
+}
+
+function showYourChoice(){
+  const choice=localStorage.getItem('valentineChoice');
+  if(choiceRecorded){
+    alert(`Gabrielle picked: ${choice.toUpperCase()}`);
+  } else {
+    alert("She hasn't made a choice yet!");
+  }
+}
+</script>
+
+<button onclick="showYourChoice()" style="margin-top:20px;">Check Her Choice</button>
+
+</body>
+</html>
